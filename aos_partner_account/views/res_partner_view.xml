@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data> 
+    
+		<record id="view_partner_property_form_aos_jvp" model="ir.ui.view">
+	        <field name="name">res.partner.account.form.jvp</field>
+	        <field name="model">res.partner</field>
+		    <field name="inherit_id" ref="account.view_partner_property_form"/>
+		    <field name="arch" type="xml">
+		    	<group name="accounting_entries" position="after">
+		    		<!-- <group string="Admin Taxes" name="tax_info">
+		    			<field name="vendor_tax"/>
+			    		<field name="pkp_no"/>
+			        	<field name="taxes_id" widget="many2many_tags" attrs="{'invisible': [('customer','=',False)]}"/>
+			        	<field name="supplier_taxes_id" widget="many2many_tags" attrs="{'invisible': [('supplier','=',False)]}"/>
+			    		<field name="admin_tax_name"/>
+			    		<field name="admin_tax_email"/>
+			    		<field name="admin_tax_wp"/>
+			    	</group> -->
+		    		<!-- <group string="Banks" name="banks_detail">
+			    		<field name="bank_ids" nolabel="1">
+			    			<tree string="Bank Accounts">
+			                    <field name="sequence" invisible="1"/>
+			                    <field name="bank_id"/>
+			                    <field name="acc_number" string="Bank No"/>
+			                    <field name="bank_name"/>
+			                    <field name="bank_bic" string="Swift Code"/>
+			                    <field name="street"/>
+			                    <field name="street2"/>
+			                    <field name="company_id" groups="base.group_multi_company"/>
+			                </tree>
+			                <form string="Bank Accounts">
+			                	<group col="4" colspan="4">
+			                    	<field name="bank_id"/>
+				                    <field name="acc_number" string="Bank No"/>
+				                    <field name="bank_name"/>
+				                    <field name="bank_bic" string="Swift Code"/>
+				                    <field name="street"/>
+				                    <field name="street2"/>
+				                    <field name="company_id" groups="base.group_multi_company"/>
+			                	</group>
+			                </form>
+			    		</field>
+			    	</group> -->
+		    	</group>
+		        <xpath expr="//field[@name='currency_id']" position="attributes">
+		        	<attribute name="invisible">1</attribute>
+		        </xpath>
+			    <xpath expr="//field[@name='property_account_receivable_id']" position="after">
+		        	<field name="property_account_advance_receivable_id" options="{'no_create': True}" 
+		        		attrs="{'invisible': [('customer','=',False)]}"/>
+		        </xpath>	
+		        <xpath expr="//field[@name='property_account_receivable_id']" position="attributes">
+		        	<attribute name="options">{'no_create': True}</attribute>
+		        	<attribute name="attrs">{'invisible': [('customer','=',False)]}</attribute>
+		        </xpath>			
+			    <xpath expr="//field[@name='property_account_payable_id']" position="after">
+		        	<field name="property_account_advance_payable_id" options="{'no_create': True}" 
+		        		attrs="{'invisible': [('supplier','=',False)]}"/>
+		        	<field name="property_account_asset_leasing_id" options="{'no_create': True}" 
+		        		attrs="{'invisible': [('supplier','=',False)]}"/>
+		        </xpath>					
+			    <xpath expr="//field[@name='property_account_payable_id']" position="attributes">
+		        	<attribute name="options">{'no_create': True}</attribute>
+		        	<attribute name="attrs">{'invisible': [('supplier','=',False)]}</attribute>
+		        </xpath>					
+			    <!-- <xpath expr="//field[@name='debit']" position="attributes">
+		        	<attribute name="groups">aos_base_account.group_accounting_receivable</attribute>
+		        </xpath>
+			    <xpath expr="//field[@name='credit']" position="attributes">
+		        	<attribute name="groups">aos_base_account.group_accounting_payable</attribute>
+		        </xpath> -->
+		    </field>
+		</record>
+	
+    </data>
+</odoo> 

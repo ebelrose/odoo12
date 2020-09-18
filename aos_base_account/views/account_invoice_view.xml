@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        
+		<record id="invoice_form_base" model="ir.ui.view">
+		    <field name="name">account.invoice.form</field>
+		    <field name="model">account.invoice</field>
+		    <field name="inherit_id" ref="account.invoice_form"/>
+		    <field name="arch" type="xml">					
+				<field name="partner_id" position="after">
+					<field name="attn" placeholder="Attention"/>
+				</field>
+				<xpath expr="//page[@name='other_info']/group/group[1]/field[@name='company_id']" position="after">
+	    			<field name="journal_bank_id"/>
+	    			<field name="signature"/>
+	            </xpath>
+		    </field>
+		</record>
+		
+		<record id="view_invoice_form_supplier_base" model="ir.ui.view">
+			<field name="name">account.invoice.supplier.form</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_supplier_form"/>
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="attn" placeholder="Attention"/>
+				</field>
+				<xpath expr="//page[2]/group/group[2]/field[@name='company_id']" position="after">
+	    			<field name="journal_bank_id"/>
+	    			<field name="signature"/>
+	            </xpath>
+			</field>
+		</record>
+</odoo>

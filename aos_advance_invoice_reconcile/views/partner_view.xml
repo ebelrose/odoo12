@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+		<record model="ir.ui.view" id="partner_view_button_advance">
+            <field name="name">partner.view.buttons</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="groups_id" eval="[(4, ref('account.group_account_invoice'))]"/>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button type="object" class="oe_stat_button" icon="fa-pencil-square-o" name="action_view_partner_advances_receivable"
+                        attrs="{'invisible': [('customer', '=', False)]}">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="total_receivable_advanced" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                            <span class="o_stat_text">Advance (Customer)</span>
+                        </div>
+                    </button>
+                    <button type="object" class="oe_stat_button" icon="fa-pencil-square-o" name="action_view_partner_advances_payable"
+                        attrs="{'invisible': [('supplier', '=', False)]}">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="total_payable_advanced" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            </span>
+                            <span class="o_stat_text">Advance (Vendor)</span>
+                        </div>
+                    </button>
+                </div>
+            </field>
+        </record>
+		
+    </data>
+</odoo> 

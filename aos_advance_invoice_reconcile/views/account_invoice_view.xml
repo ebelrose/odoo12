@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data> 
+		
+		<record id="view_account_advance_form_jvp" model="ir.ui.view">
+		    <field name="name">account.invoice.form</field>
+		    <field name="model">account.invoice</field>
+		    <field name="inherit_id" ref="account.invoice_form"/>
+		    <field name="arch" type="xml">                   
+					<field name="partner_id" position="attributes">
+						<attribute name="domain">[('customer', '=', True),'|',('is_company','=',True),('parent_id','=',False)]</attribute>
+						<attribute name="options">{'no_create': True}</attribute>
+					</field>
+		    		<xpath expr="//field[@name='payment_term_id']" position="after">
+		    			<field name="is_advance" invisible="1"/>
+		    			<field name="is_asset" invisible="1"/>
+		    		</xpath>	
+		    		<xpath expr="//field[@name='move_id']" position="after">
+		    			<field name="account_advance_id" options="{'no_create': True}" invisible="context.get('show_advance')"/>
+		    		</xpath>		
+					<group class="oe_subtotal_footer oe_right" position="replace">
+						<group>
+                            <group invisible="context.get('show_advance')">
+                                <div class="oe_inline">
+                                	<label for="button_dp" string="Down Payment" class="oe_inline" style="font-size:14px;font-weight:bold;"/>
+                                	<button name="%(action_update_advance_payment_jvp)d" type="action" class="fa fa-refresh oe_inline" help="Load Down Payment Account"/>                    
+                                    <field name="advance_line_ids">
+		                                <tree string="Down Payment Items" create="false" delete="false" editable="bottom" decoration-info="(move_check == False)">
+						                    <field name="name" readonly="1"/>
+						                    <field name="move_line_id" invisible="1"/>
+						                    <field name="move_id" invisible="1"/>
+						                    <field name="type" invisible="1"/>
+						                    <field name="journal_id" invisible="1"/>
+						                    <field name="company_currency_id" readonly="True" invisible="1" />
+						                    <field name="amount" widget="monetary" readonly="1" options="{'currency_field': 'company_currency_id'}"/>
+						                    <field name="account_id" invisible="1"/>
+						                    <field name="invoice_currency_id" readonly="True" invisible="1" />
+						                    <field name="base" widget="monetary" options="{'currency_field': 'invoice_currency_id'}"/>
+						                    <field name="move_check" invisible="0"/>
+						                    <field name="move_posted_check" invisible="1"/>
+		                                    <field name="parent_state" invisible="1"/>
+		                                    <button name="action_apply" icon="fa-book" type="object" attrs="{'invisible': [('parent_state','!=','open')]}"/>
+						                </tree>
+						                <form>
+						                	<group col="4" colspan="4">
+												<field name="name"/>
+		                    					<field name="company_currency_id" invisible="1"/>
+												<field name="amount" options="{'currency_field': 'company_currency_id'}"/>
+												<field name="journal_id"/>
+						                    	<field name="invoice_currency_id" readonly="True" invisible="1" />
+												<field name="base" options="{'currency_field': 'invoice_currency_id'}"/>
+												<field name="account_id"/>
+												<field name="move_id" invisible="0"/>
+												<field name="move_line_id" invisible="0"/>
+												<field name="currency_id"/>
+							                </group>
+						                </form>
+		                            </field>
+                                </div>
+                            </group>
+                            <group class="oe_subtotal_footer oe_right">                            
+                            	<field name="amount_untaxed" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_tax"/>
+                                <field name="amount_advance" invisible="context.get('show_advance')"/>
+                                <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                                <field name="payments_widget" colspan="2" nolabel="1" widget="payment"/>
+                                <field name="residual" class="oe_subtotal_footer_separator" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                                <field name="reconciled" invisible="1"/>
+                                <field name="outstanding_credits_debits_widget" colspan="2" nolabel="1" widget="payment" attrs="{'invisible': [('state', 'not in', 'open')]}"/>
+                            </group>
+                        </group>
+					</group>
+		    		<xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+		    			<attribute name="context">{'type': type, 'journal_id': journal_id, 'default_invoice_id': id, 'is_advance': is_advance}</attribute>
+		    		</xpath>
+		    		<xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
+		    			<attribute name="domain">[('advance_ok','=',parent.is_advance)]</attribute>
+		    		</xpath>
+		    		<!-- <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+		    			<attribute name="invisible">1</attribute>
+		    		</xpath> -->
+		    		<xpath expr="//group/group/field[@name='account_id']" position="attributes">
+	            		<attribute name="options">{'no_create': True}</attribute>
+	            		<attribute name="domain">[('company_id', '=', company_id), ('deprecated', '=', False), ('internal_type','=','receivable')]</attribute>
+	            		<attribute name="context">{'search_default_payable': type in ['in_invoice','in_refund'],'search_default_liquidity': type in ['in_direct','out_direct']}</attribute>
+	            	</xpath>
+		    </field>
+		</record>
+		
+		<record id="view_invoice_form_aos_supplier_accounting" model="ir.ui.view">
+			<field name="name">account.invoice.supplier.form</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_supplier_form"/>
+			<field name="arch" type="xml">
+				<field name="partner_id" position="attributes">
+					<attribute name="domain">[('supplier', '=', True),'|',('is_company','=',True),('parent_id','=',False)]</attribute>
+					<attribute name="options">{'no_create': True}</attribute>
+				</field>
+	    		<xpath expr="//field[@name='payment_term_id']" position="after">
+	    			<field name="is_advance" invisible="1"/>
+	    			<field name="is_asset" invisible="1"/>
+	    		</xpath>
+				<xpath expr="//field[@name='date']" position="after">
+	    			<field name="account_advance_id" options="{'no_create': True}" invisible="context.get('show_advance')"/>
+	    		</xpath>
+				<xpath expr="//field[@name='amount_untaxed']" position="attributes">
+            		<attribute name="class">oe_subtotal_footer_separator</attribute>
+            	</xpath>
+            	<xpath expr="//field[@name='amount_tax']" position="after">
+            		<field name="amount_advance" invisible="context.get('show_advance')"/>
+            	</xpath>
+	    		<!-- <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']" position="attributes">
+	    			<attribute name="invisible">1</attribute>
+	    		</xpath> -->
+	    		<xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+	    			<attribute name="context">{'type': type, 'journal_id': journal_id, 'default_invoice_id': id, 'is_advance': is_advance}</attribute>
+	    		</xpath>
+	    		<xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="attributes">
+	    			<attribute name="domain">[('advance_ok','=',parent.is_advance)]</attribute>
+	    		</xpath>
+	    		<field name="tax_line_ids" position="replace">
+                	<label for="button_dp" string="Down Payment" class="oe_inline" style="font-size:14px;font-weight:bold;" invisible="context.get('show_advance')"/>
+                	<button name="%(action_update_advance_payment_jvp)d" type="action" class="fa fa-refresh oe_inline" help="Load Down Payment Account" invisible="context.get('show_advance')"/>                    
+                    <field name="advance_line_ids" invisible="context.get('show_advance')">
+                        <tree string="Down Payment Items" create="false" delete="false" editable="bottom" decoration-info="(move_check == False)">
+		                    <field name="name" readonly="1"/>
+		                    <field name="move_line_id" invisible="1"/>
+		                    <field name="move_id" invisible="1"/>
+		                    <field name="type" invisible="1"/>
+		                    <field name="journal_id" invisible="1"/>
+		                    <field name="company_currency_id" invisible="1"/>
+		                    <field name="amount" readonly="1" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
+		                    <field name="account_id" invisible="1"/>
+		                    <field name="invoice_currency_id" invisible="1"/>
+		                    <field name="base" widget="monetary" options="{'currency_field': 'invoice_currency_id'}"/>
+		                    <field name="move_check" invisible="0"/>
+		                    <field name="move_posted_check" invisible="1"/>
+                            <field name="parent_state" invisible="1"/>
+		                    <field name="currency_id" readonly="True" invisible="1" />
+		                </tree>
+		                <form>
+		                	<group col="4" colspan="4">
+								<field name="name"/>
+		                   	 	<field name="company_currency_id" invisible="1"/>
+								<field name="amount" options="{'currency_field': 'company_currency_id'}"/>
+								<field name="journal_id"/>
+		                    	<field name="invoice_currency_id" invisible="1"/>
+								<field name="base" options="{'currency_field': 'invoice_currency_id'}"/>
+								<field name="account_id"/>
+								<field name="move_id" invisible="0"/>
+								<field name="move_line_id" invisible="0"/>
+								<field name="currency_id"/>
+			                </group>
+		                </form>
+                    </field>
+                </field>
+                <xpath expr="//page[2]/group" position="after">
+                	<field name="tax_line_ids">
+                        <tree editable="bottom" string="Taxes">
+                            <field name="name"/>
+                            <!--Need invisible fields for on_change to create all necessary info -->
+                            <field name="tax_id" invisible="1"/>
+                            <field name="sequence" invisible="1"/>
+                            <field name="manual" invisible="1"/>
+                            <field name="account_id" groups="account.group_account_invoice"/>
+                            <field name="account_analytic_id" domain="[('company_id', '=', parent.company_id)]" groups="analytic.group_analytic_accounting"/>
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </xpath>
+			</field>
+		</record>
+        <!-- INVOICE -->
+		<!--  -->
+		
+		<record id="account.action_invoice_tree1" model="ir.actions.act_window">
+            <!-- <field name="name">Customer Invoices</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/> -->
+            <field name="domain">[('type','=','out_invoice'),('is_advance','=',False)]</field>
+            <field name="context">{'is_advance': False, 'show_advance': False, 'type':'out_invoice', 'journal_type': 'sale'}</field>
+            <!-- <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a customer invoice.
+              </p><p>
+                Odoo's electronic invoicing allows to ease and fasten the
+                collection of customer payments. Your customer receives the
+                invoice by email and he can pay online and/or import it
+                in his own system.
+              </p><p>
+                The discussions with your customer are automatically displayed at
+                the bottom of each invoice.
+              </p>
+            </field> -->
+        </record>
+        
+        <record id="account.action_vendor_bill_template" model="ir.actions.act_window">
+            <!-- <field name="name">Vendor Bills</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/> -->
+            <field name="domain">[('type','=','in_invoice'),('is_advance','=',False),('is_asset','=',False)]</field>
+            <field name="context">{'is_advance': False, 'show_advance': False, 'default_type': 'in_invoice', 'type': 'in_invoice', 'journal_type': 'purchase', 'default_is_asset': 0}</field>
+            <!-- <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to record a new vendor bill.
+              </p><p>
+                You can control the invoice from your vendor according to
+                what you purchased or received.
+              </p>
+            </field> -->
+        </record>
+        
+        <!-- CUSTOMER REFUND -->
+        
+        <!-- <record id="action_refund_tree1_jvp" model="ir.actions.act_window">
+            <field name="name">Credit Notes</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('type','=','out_refund'),('is_advance','=',False)]</field>
+            <field name="context">{'is_advance': False, 'show_advance': True, 'type':'out_refund', 'journal_type': 'sale_refund'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a customer refund.
+              </p><p>
+                Odoo's electronic invoicing allows to ease and fasten the
+                collection of customer payments. Your customer receives the
+                invoice by email and he can pay online and/or import it
+                in his own system.
+              </p><p>
+                The discussions with your customer are automatically displayed at
+                the bottom of each invoice.
+              </p>
+            </field>
+        </record>
+
+        <record id="action_refund_tree1_view1_jvp" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="account.invoice_tree"/>
+            <field name="act_window_id" ref="action_refund_tree1_jvp"/>
+        </record>
+
+        <record id="action_refund_tree1_view2_jvp" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account.invoice_form"/>
+            <field name="act_window_id" ref="action_refund_tree1_jvp"/>
+        </record>
+
+        <menuitem action="action_refund_tree1_jvp" id="menu_action_refund_tree1_jvp" parent="account.menu_finance_receivables" sequence="2"/> -->
+		<!-- SUPPLIER REFUND -->
+		
+		<!-- <record id="action_refund_tree2_jvp" model="ir.actions.act_window">
+            <field name="name">Vendor Refunds</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('type','=','in_refund'),('is_advance','=',False)]</field>
+            <field name="context">{'is_advance': False, 'show_advance': True, 'default_type': 'in_refund', 'type': 'in_refund', 'journal_type': 'purchase_refund'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to record a new vendor refund.
+              </p><p>
+                You can control the invoice from your vendor according to
+                what you purchased or received.
+              </p>
+            </field>
+        </record>
+
+        <record id="action_refund_supplier_tree1_view1_jvp" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="account.invoice_supplier_tree"/>
+            <field name="act_window_id" ref="action_refund_tree2_jvp"/>
+        </record>
+
+        <record id="action_refund_supplier_tree1_view2_jvp" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account.invoice_supplier_form"/>
+            <field name="act_window_id" ref="action_refund_tree2_jvp"/>
+        </record>
+
+        <menuitem action="action_refund_tree2_jvp" id="menu_action_refund_tree2_jvp" parent="account.menu_finance_payables" sequence="2"/> -->
+		<!-- ADVANCE SALES -->
+        <record id="action_advance_tree1_jvp" model="ir.actions.act_window">
+            <field name="name">Down Payment</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('is_advance','=',True),('type','=','out_invoice')]</field>
+            <field name="context">{'is_advance': True, 'show_advance': True, 'type':'out_invoice', 'journal_type': 'sale_advance'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a advance sales / advance invoice.
+              </p><p>
+                Odoo's electronic invoicing allows to ease and fasten the
+                collection of customer payments. Your customer receives the
+                invoice by email and he can pay online and/or import it
+                in his own system.
+              </p><p>
+                The discussions with your customer are automatically displayed at
+                the bottom of each invoice.
+              </p>
+            </field>
+        </record>
+
+
+        <record id="action_advance_tree1_view1_jvp" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="account.invoice_tree"/>
+            <field name="act_window_id" ref="action_advance_tree1_jvp"/>
+        </record>
+
+        <record id="action_advance_tree1_view2_jvp" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account.invoice_form"/>
+            <field name="act_window_id" ref="action_advance_tree1_jvp"/>
+        </record>
+
+        <menuitem action="action_advance_tree1_jvp" id="menu_action_advance_tree1_jvp" parent="account.menu_finance_receivables" sequence="0"/>
+		
+		<!-- ADVANCE PURCHASE -->
+        <record id="action_advance_tree2_jvp" model="ir.actions.act_window">
+            <field name="name">Down Payment</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('is_advance','=',True),('type','=','in_invoice')]</field>
+            <field name="context">{'is_advance': True, 'show_advance': True, 'type':'in_invoice', 'journal_type': 'purchase_advance'}</field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a advance purchase / advance invoice.
+              </p><p>
+                Odoo's electronic invoicing allows to ease and fasten the
+                collection of customer payments. Your customer receives the
+                invoice by email and he can pay online and/or import it
+                in his own system.
+              </p><p>
+                The discussions with your customer are automatically displayed at
+                the bottom of each invoice.
+              </p>
+            </field>
+        </record>
+
+
+        <record id="action_advance_purchase_tree1_view1_jvp" model="ir.actions.act_window.view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="account.invoice_supplier_tree"/>
+            <field name="act_window_id" ref="action_advance_tree2_jvp"/>
+        </record>
+
+        <record id="action_advance_purchase_tree1_view2_jvp" model="ir.actions.act_window.view">
+            <field eval="2" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="account.invoice_supplier_form"/>
+            <field name="act_window_id" ref="action_advance_tree2_jvp"/>
+        </record>
+
+        <menuitem action="action_advance_tree2_jvp" id="menu_action_advance_tree2_jvp" parent="account.menu_finance_payables" sequence="0"/>
+			
+    </data>
+</odoo> 

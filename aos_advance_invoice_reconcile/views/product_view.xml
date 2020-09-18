@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    
+     
+    	<!-- <record id="product_template_form_view_is_advance_jvp" model="ir.ui.view">
+	        <field name="name">product.template.jvp.advance.form</field>
+	        <field name="model">product.template</field>
+		    <field name="inherit_id" ref="product.product_template_form_view"/>
+		    <field name="arch" type="xml">
+		    	<div name="options" position="inside">
+		    		<div groups="base.group_no_one">
+                        <field name="advance_ok"/>
+                        <label for="advance_ok"/>
+                    </div>
+		    	</div>
+		    </field>
+		</record> -->
+		
+		<record model="ir.ui.view" id="product_template_form_view_is_advance">
+            <field name="name">product.template.invoice.policy</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="account.product_template_form_view"/>
+            <field name="arch" type="xml">
+            	<group name="accounting" position="inside">
+            		<field name="advance_ok"/>
+            	</group>
+            </field>
+        </record>
+		
+		
+		
+    </data>
+</odoo> 
